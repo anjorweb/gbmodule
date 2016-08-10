@@ -6,12 +6,7 @@
 
 	<!-- build:js js/index.min.js -->
 	<script src="./js/zepto.min.js"></script>
-	<script src="./js/gbmodule/module.js"></script>
-	<script src="./js/gbmodule/tool.js"></script>
-	<script src="./js/gbmodule/gbrouter.js"></script>
-	<script src="./js/gbmodule/router.js"></script>
-	<script src="./js/gbmodule/dom.js"></script>
-	<script src="./js/gbmodule/scope.js"></script>
+	<script src="./js/gb.js"></script>
 	<!-- endbuild -->
 
 	<!-- build:css css/index.min.css -->
@@ -25,64 +20,44 @@
 	var app = gb.module('app', [], function (m0, $router, $libsLoader) {
 		$router
 				.loading({tpl: 'tpl/loading.html'})
-				.when('/page0', {tpl: 'tpl/page0.html', libs: ['./css/lib.css'], asIndex: true})
+				.when('/page0', {tpl: 'tpl/page0.html', asIndex: true})
 				.when('/page1', {tpl: 'tpl/page1.html', asIndex: true})
-				.otherwise('/page0')
-//                .useVirtualRouter(true);
-//		$libsLoader.load('css/a.css');
+				.other('/page0')
+                .useVirtualRouter(true);
+		$libsLoader.load('css/a.css');
 	});
+	app.controller('loading', function($scope, $router){
 
-	app.controller('loading', function ($scope, m0) {
-		console.log('#run loading', m0);
-		$scope.$view.css('opacity', .5);
-		$scope.onLibsProgress = function (p) {
-			$scope.$view.html('loading:' + p + '%');
-		};
-		$scope.onLibsComplete = function () {
-			$scope.closeLoading();
-		};
-		$scope.loadLibs();
-		$scope.onAdd = function () {
-			$scope.add();
+	});
+	app.controller('page0', function($m0, $scope, $router){
+		$scope.$view.show();
+		$scope.$view.click(function () {
+			$router.goto('/page1', {result:"从page0传递给page1"});
+		});
+		$scope.onAdd = function(d){
+			console.dir("page0:"+$m0.name);
+			
 		}
-		$scope.onRemove = function () {
+		$scope.onRemove = function(){
 			$scope.remove();
-		};
-	});
+		}
 
-	app.controller('page0', function ($scope, $router, m0) {
-		console.log(m0);
+	});
+	app.controller('page1', function($scope, $router){
+		$scope.onAdd = function(d){
+			alert(d.data.result);
+		}
+		$scope.$view.show();
 		$scope.$view.click(function () {
-			$router.goto('/page1', 1);
+			$router.goto('/page0', 0);
 		});
-		$scope.onAdd = function (d) {
-			console.log('p0 add:', arguments);
-			$scope.add();
-		};
-		$scope.onRemove = function (d) {
-			console.log('remove p0', arguments);
+		$scope.onRemove = function(){
 			$scope.remove();
-		};
+		}
 	});
-
-	app.controller('page1', function ($scope, $router) {
-		$scope.$view.click(function () {
-			$router.goto('/page0', 2);
-		});
-		$scope.onAdd = function (d) {
-			console.log('p1 add:', arguments);
-			$scope.add();
-		};
-		$scope.onRemove = function (d) {
-			console.log('remove p1', arguments);
-			$scope.remove();
-		};
+	app.service('$m0', function($scope, $router){
+		this.name = "m0 m0 m0"
 	});
-
-	app.service('m0', function ($router) {
-		this.name = 'm0';
-	});
-
 </script>
 
 </html>
